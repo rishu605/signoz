@@ -123,7 +123,8 @@
 
 		.menu-content {
 			.section-1 {
-				.rename-btn {
+				.rename-btn,
+				.new-panel-btn {
 					display: flex;
 					align-items: center;
 					gap: 6px;
@@ -139,6 +140,10 @@
 					.ant-btn-icon {
 						margin-inline-end: 0px;
 					}
+				}
+
+				.rename-btn {
+					padding-bottom: 10px;
 				}
 			}
 
