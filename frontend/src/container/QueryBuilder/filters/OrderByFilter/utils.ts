@@ -1,46 +1,21 @@
 import { IOption } from 'hooks/useResourceAttribute/types';
-import { cloneDeep } from 'lodash-es';
 import { parse } from 'papaparse';
 import { BaseAutocompleteData } from 'types/api/queryBuilder/queryAutocompleteResponse';
 import {
 	IBuilderQuery,
 	OrderByPayload,
 } from 'types/api/queryBuilder/queryBuilderData';
-import { DataSource } from 'types/common/queryBuilder';
 
 import { ORDERBY_FILTERS } from './config';
 import { SIGNOZ_VALUE } from './constants';
 
 export const orderByValueDelimiter = '|';
 
-const getOrderBy = (query: IBuilderQuery): OrderByPayload[] => {
-	let orderBy = cloneDeep(query.orderBy);
-
-	if (query.dataSource !== DataSource.LOGS) {
-		return orderBy;
-	}
-
-	const isIdPresent = orderBy.some((item) => item.columnName === 'id');
-	const timestampOrder = orderBy.find((item) => item.columnName === 'timestamp')
-		?.order;
-	const isTimestampPresent =
-		orderBy.some((item) => item.columnName === 'timestamp') && timestampOrder;
-
-	// Add ID if timestamp is present
-	if (isTimestampPresent && !isIdPresent) {
-		orderBy = [...orderBy, { columnName: 'id', order: timestampOrder }];
-	}
-
-	return orderBy;
-};
-
 export const transformToOrderByStringValues = (
 	query: IBuilderQuery,
 	entityVersion?: string,
 ): IOption[] => {
-	const orderBy = getOrderBy(query);
-
-	const prepareSelectedValue: IOption[] = orderBy.map((item) => {
+	const prepareSelectedValue: IOption[] = query.orderBy.map((item) => {
 		if (item.columnName === SIGNOZ_VALUE) {
 			return {
 				label: `${
