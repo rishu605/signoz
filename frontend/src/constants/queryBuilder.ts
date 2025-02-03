@@ -162,7 +162,7 @@ export const initialFilters: TagFilter = {
 	op: 'AND',
 };
 
-export const initialOrderBy: OrderByPayload[] = [
+export const initialLogsOrderBy: OrderByPayload[] = [
 	{
 		columnName: 'timestamp',
 		order: 'desc',

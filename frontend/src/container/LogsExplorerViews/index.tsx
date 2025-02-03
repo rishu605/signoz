@@ -12,7 +12,7 @@ import { LOCALSTORAGE } from 'constants/localStorage';
 import { AVAILABLE_EXPORT_PANEL_TYPES } from 'constants/panelTypes';
 import { QueryParams } from 'constants/query';
 import {
-	initialOrderBy,
+	initialLogsOrderBy,
 	initialQueriesMap,
 	initialQueryBuilderFormValues,
 	PANEL_TYPES,
@@ -538,7 +538,7 @@ function LogsExplorerViews({
 			currentMinTimeRef.current !== minTime
 		) {
 			const newRequestData = getRequestData(stagedQuery, {
-				orderBy: listQuery?.orderBy || initialOrderBy,
+				orderBy: listQuery?.orderBy || initialLogsOrderBy,
 				page: 1,
 				pageSize,
 			});
