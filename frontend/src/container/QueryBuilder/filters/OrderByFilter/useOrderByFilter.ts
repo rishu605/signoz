@@ -6,6 +6,7 @@ import { parse } from 'papaparse';
 import { useCallback, useMemo, useState } from 'react';
 import { BaseAutocompleteData } from 'types/api/queryBuilder/queryAutocompleteResponse';
 import { OrderByPayload } from 'types/api/queryBuilder/queryBuilderData';
+import { DataSource } from 'types/common/queryBuilder';
 
 import { getRemoveOrderFromValue } from '../QueryBuilderSearch/utils';
 import { getUniqueOrderByValues, getValidOrderByResult } from '../utils';
@@ -87,6 +88,45 @@ export const useOrderByFilter = ({
 		[customValue, debouncedSearchText, selectedValue],
 	);
 
+	const handleLogsOrderByTimestampCases = (
+		orderByValues: OrderByPayload[],
+	): void => {
+		if (query.dataSource !== DataSource.LOGS) {
+			return;
+		}
+
+		const hasTimestampInPreviousState = selectedValue.some(
+			(item) => getRemoveOrderFromValue(item.value) === 'timestamp',
+		);
+		const hasTimestampInNewState = orderByValues.some(
+			(item) => item.columnName === 'timestamp',
+		);
+		const hasIdInNewState = orderByValues.some(
+			(item) => item.columnName === 'id',
+		);
+
+		// Remove ID if timestamp was removed
+		if (
+			hasTimestampInPreviousState &&
+			!hasTimestampInNewState &&
+			hasIdInNewState
+		) {
+			const idIndex = orderByValues.findIndex((item) => item.columnName === 'id');
+			orderByValues.splice(idIndex, 1);
+		}
+		// Add ID when timestamp exists
+		else if (!hasIdInNewState && hasTimestampInNewState) {
+			const timestampOrder =
+				orderByValues.find((item) => item.columnName === 'timestamp')?.order ??
+				'asc';
+
+			orderByValues.push({
+				columnName: 'id',
+				order: timestampOrder,
+			});
+		}
+	};
+
 	const handleChange = (values: IOption[]): void => {
 		const validResult = getValidOrderByResult(values);
 		const result = getUniqueOrderByValues(validResult);
@@ -113,6 +153,8 @@ export const useOrderByFilter = ({
 				order: orderValue,
 			};
 		});
+
+		handleLogsOrderByTimestampCases(orderByValues);
 
 		setSearchText('');
 		onChange(orderByValues);
